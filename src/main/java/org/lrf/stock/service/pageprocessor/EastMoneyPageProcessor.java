@@ -1,21 +1,13 @@
 package org.lrf.stock.service.pageprocessor;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -25,10 +17,6 @@ import org.json.JSONObject;
 import org.lrf.stock.entity.Code;
 import org.lrf.stock.repository.CodeRepository;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-
-import ch.qos.logback.core.net.SyslogOutputStream;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
