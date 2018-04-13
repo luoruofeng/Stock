@@ -38,6 +38,6 @@ public class CodeManager implements CommandLineRunner {
 		stockService.createStockIndex();
 		
 		//计算codeResult
-		//codeResultService.setAllCodeResult();
+		codeResultService.saveAllCodeResult();
 	}
 }

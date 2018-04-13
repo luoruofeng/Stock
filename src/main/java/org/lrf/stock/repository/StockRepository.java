@@ -23,6 +23,10 @@ public class StockRepository{
 		mongoTemplate.insertAll(stocks);
 	}
 	
+	public void saveOrUpdateStock(Stock stock) {
+		mongoTemplate.save(stock);
+	}
+	
 	public void dropCollection() {
 		mongoTemplate.dropCollection(Stock.class);
 	}

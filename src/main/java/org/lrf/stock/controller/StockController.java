@@ -1,6 +1,6 @@
 package org.lrf.stock.controller;
 
-import org.lrf.stock.service.StockService;
+import org.lrf.stock.service.StockServiceImpl;
 import org.lrf.stock.util.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class StockController {
 	
 	@Autowired
-	private StockService stockService;
+	private StockServiceImpl stockService;
 	
 	@RequestMapping("stocks")
 	public ModelAndView getAllStock(String code) {

@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.Comparator;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 public class Stock {
 
 	private static final String NONE = "None";
@@ -218,8 +220,7 @@ public class Stock {
 		return "Stock [DATE=" + date + ", STOCKSYMBOL=" + code + ", STOCKNAME=" + name + ", TCLOSE=" + close + ", HIGH="
 				+ high + ", LOW=" + low + ", TOPEN=" + open + ", LCLOSE=" + previousClose + ", CHG=" + changeAmount
 				+ ", PCHG=" + changeRate + ", TURNOVER=" + turnoverRate + ", VOTURNOVER=" + vol + ", VATURNOVER=" + GMV
-				+ ", TCAP=" + totalValue + ", MCAP=" + circulationMarketValue + ", toString()=" + super.toString()
-				+ "]";
+				+ ", TCAP=" + totalValue + ", MCAP=" + circulationMarketValue + "]";
 	}
 
 	private long stringToLong(String str) {

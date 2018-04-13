@@ -3,8 +3,13 @@ package org.lrf.stock.entity;
 import java.util.List;
 
 import org.lrf.stock.util.DateUtil;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 public class CodeResult {
+	
+	public CodeResult() {}
+	
 	private String code;
 	private int numberOfDays;
 	private Double avg;

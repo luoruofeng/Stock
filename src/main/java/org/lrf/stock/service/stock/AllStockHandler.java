@@ -12,19 +12,16 @@ public class AllStockHandler {
 	
 	private static AllStockHandler handler = new AllStockHandler();
 	
-	private List<Stock> stocks = new ArrayList<>();
-
-	@Autowired
-	private StockRepository stockRepository;
+	private static List<Stock> stocks = new ArrayList<>();
 	
 	public static AllStockHandler instance() {
 		return handler;
 	}
 	
-	public List<Stock> getAllStock(){
-		if (stocks == null) {
-			synchronized(this) {
-				if (stocks == null) {
+	public static List<Stock> getAllStock(StockRepository stockRepository){
+		if (stocks.isEmpty()) {
+			synchronized(stocks) {
+				if (stocks.isEmpty()) {
 					stocks = stockRepository.findAll();
 				}
 			}

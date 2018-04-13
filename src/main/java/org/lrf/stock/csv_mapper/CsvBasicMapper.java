@@ -39,7 +39,7 @@ public class CsvBasicMapper<T> {
 		
 		try {
 			T result = (T) t.getClass().getConstructor(argsClass).newInstance(args);
-			System.out.println("create stock ----- "+result.toString());
+			//System.out.println("create stock ----- "+result.toString());
 			return result;
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
