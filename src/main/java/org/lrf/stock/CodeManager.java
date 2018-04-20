@@ -27,17 +27,31 @@ public class CodeManager implements CommandLineRunner {
 		
 		//给刚才所有以保存的code设置上市日期
 		//stockService.setAllStockStartTime();
+			
 		
 		//下载刚才excel历史记录
-		//stockService.downloadExcelFilesAndSaveExcel();
+		//stockService.downloadAllExcelFilesAndSaveExcel();
+		
+		//删除DB中的所有stock
+		//stockService.dropAllStock();
 		
 		//把Excel转对象，进行保存
-		stockService.saveStockCSVToDB();
+		//stockService.saveAllCSVToDB();
 		
 		//对stock对象里面的code建立索引
-		stockService.createStockIndex();
+		//stockService.createStockIndex();
 		
 		//计算codeResult
 		codeResultService.saveAllCodeResult();
+		
+		//test get new stock 
+		//stockService.saveNoRecordStock();
+		
+		//dwq
+		//stockService.downloadRestExcelFilesAndSaveExcel();
+		//stockService.saveTempCSVToDB();
+		
+		
+		
 	}
 }

@@ -7,17 +7,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class CountDownLockProxy {
 
-	public void procced(int countDownLatchNumber ,CountDownLatchUser user) throws InterruptedException {
-		
-		
+	public void procced(int countDownLatchNumber, CountDownLatchUser user,boolean isBlock) throws InterruptedException {
+
 		System.out.println("*** create CountDownLatch ***");
-		
-		CountDownLatch cdl = new CountDownLatch(countDownLatchNumber);
-		
+
+		CountDownLatch cdl = null;
+		if (isBlock)
+			cdl = new CountDownLatch(countDownLatchNumber);
+
 		user.useCountDownLatch(cdl);
 
-		System.out.println("*** current thread wait *** " + Thread.currentThread());
-		cdl.await();
-		System.out.println("*** current thread start *** " + Thread.currentThread());
+		if (isBlock) {
+			System.out.println("*** current thread wait *** " + Thread.currentThread());
+			cdl.await();
+			System.out.println("*** current thread start *** " + Thread.currentThread());
+		}
 	}
 }

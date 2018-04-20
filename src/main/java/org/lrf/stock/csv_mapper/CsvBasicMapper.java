@@ -14,8 +14,6 @@ import org.lrf.stock.util.csv.YTableEntityFactory;
 import cn.hutool.core.text.csv.CsvData;
 
 public class CsvBasicMapper<T> {
-
-	
 	
 	private CsvData csvData;
 

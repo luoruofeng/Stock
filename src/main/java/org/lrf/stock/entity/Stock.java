@@ -1,5 +1,6 @@
 package org.lrf.stock.entity;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,37 +16,42 @@ public class Stock {
 
 	@Id
 	private String id;
-
-	// 日期
+	
+	// 日期0
 	private Date date;
-	// 股票代码
+	// 股票代码0
 	private String code;
-	// 名称
+	// 名称0
 	private String name;
-	// 收盘价
+	// 收盘价0
 	private Double close;
-	// 最高价
+	// 最高价0
 	private Double high;
-	// 最低价
+	// 最低价0
 	private Double low;
-	// 开盘价
+	// 开盘价0
 	private Double open;
 	// 前收盘
 	private Double previousClose;
-	// 涨跌额
+	// 涨跌额0
 	private Double changeAmount;
-	// 涨跌幅
+	// 涨跌幅0
 	private Double changeRate;
-	// 换手率
+	// 换手率0
 	private Double turnoverRate;
-	// 成交量
+	// 成交量0
 	private Long vol;
-	// 成交金额
+	// 成交金额0
 	private Double GMV;
 	// 总市值
 	private Long totalValue;
 	// 流通市值
 	private Long circulationMarketValue;
+	 //振幅0
+	 private Double amplitude;
+	 
+	 
+	
 
 	public Stock() {
 	}
@@ -177,12 +183,23 @@ public class Stock {
 	public void setCirculationMarketValue(Long circulationMarketValue) {
 		this.circulationMarketValue = circulationMarketValue;
 	}
+	          
+	
+	
+	public Double getAmplitude() {
+		return this.amplitude;
+	}
+	
+	public void setAmplitude(Double amplitude) {
+		this.amplitude = amplitude;
+	}
 
 	public Stock(String date, String code, String name, String close, String high, String low, String open,
 			String previousClose, String changeAmount, String changeRate, String turnoverRate, String vol, String gMV,
 			String totalValue, String circulationMarketValue) {
 		super();
-		setDate(date);
+		System.out.println("*");
+		setDate(formatDate(date));
 		this.code = (code != null) ? code.substring(1) : "";
 		this.name = name;
 		this.close = new Double(checkNone(close));
@@ -196,16 +213,17 @@ public class Stock {
 		this.vol = new Long(checkNone(vol));
 		this.GMV = new Double(checkNone(gMV));
 		this.totalValue = stringToLong(checkNone(totalValue));
-		this.circulationMarketValue = stringToLong(checkNone(circulationMarketValue));
+		setCaculateAmplitude();
 	}
-
-	private void setDate(String dateStr) {
+	
+	public static Date formatDate(String dateStr) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try {
-			setDate(sdf.parse(dateStr));
+			return sdf.parse(dateStr);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	private String checkNone(String arg) {
@@ -240,5 +258,16 @@ public class Stock {
 			return 0;
 		}
 	}
+	
+	private static final String AMPLITUDE_FORMAT = "#.00";
+	public void setCaculateAmplitude() {
+		
+		if(this.low == null || this.high == null || this.low == 0D || this.high == 0D) {
+			setAmplitude(0D);
+			return;
+		}
+		setAmplitude(new Double(new DecimalFormat(AMPLITUDE_FORMAT).format((this.high-this.low)/this.high)));
+	}
+	
 	
 }

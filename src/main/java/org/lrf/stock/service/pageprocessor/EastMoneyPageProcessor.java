@@ -38,6 +38,7 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 
 	@Override
 	public void process(Page page) {
+		System.out.println("&&&&&&&&&&&&&");
 		codeRepository.dropCollection();
 		Selectable selectable = page.getHtml().xpath("//div[@id='quotesearch']/ul/li/a[@href]/text()");
 		List<String> allCodeData = selectable.all();
@@ -116,6 +117,7 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 	}
 
 	private void retrySpareUrl() {
+		System.out.println("-----------开始重试-----------");
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet();
 		httpGet.setURI(URI.create(

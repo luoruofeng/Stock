@@ -18,7 +18,9 @@ public class CodeService{
 	private CodeRepository codeRepository;
 	
     public void writeCodeToFile() {
+    	System.out.println("-------开始下载-------");
     		List<Code> codes =codeRepository.findAll();
+
     		if(codes == null || codes.size() == 0) {
     			EastMoneyPageProcessor empp = new EastMoneyPageProcessor(codeRepository);
     			Spider.create(empp).addUrl("http://quote.eastmoney.com/stocklist.html").setSpiderListeners(Arrays.asList(empp)).thread(1).run();

@@ -20,6 +20,7 @@ public class CodeRepository{
 	
 	public List<Code> findAll(){
 		return mongoTemplate.findAll(Code.class);
+
 	}
 	
 	public void saveCodes(List<Code> codes) {
