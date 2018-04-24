@@ -1,5 +1,6 @@
 package org.lrf.stock.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.lrf.stock.util.DateUtil;
@@ -11,12 +12,20 @@ public class CodeResult {
 	public CodeResult() {}
 	
 	private String code;
+	private Date date;
 	private int numberOfDays;
 	private Double avg;
 	private Double max;
 	private Double min;
 	private List<Stock> aboveAvgMaxs;
 	private List<Stock> belowAvgMins;
+	
+	public Date getDate() {
+		return date;
+	}
+	public void setDate(Date date) {
+		this.date = date;
+	}
 	public String getCode() {
 		return code;
 	}
@@ -60,14 +69,15 @@ public class CodeResult {
 	public void setBelowAvgMins(List<Stock> belowAvgMins) {
 		this.belowAvgMins = belowAvgMins;
 	}
-	public CodeResult(String code, int numberOfDays) {
+	public CodeResult(String code, int numberOfDays,Date calculatorDate) {
 		super();
 		this.code = code;
 		this.numberOfDays = numberOfDays;
+		this.date = calculatorDate;
 	}
 	
 	public CodeResult(String code, int numberOfDays, Double avg, Double max, Double min, List<Stock> aboveAvgMaxs,
-			List<Stock> belowAvgMins) {
+			List<Stock> belowAvgMins,Date date) {
 		super();
 		this.code = code;
 		this.numberOfDays = numberOfDays;
@@ -76,6 +86,7 @@ public class CodeResult {
 		this.min = min;
 		this.aboveAvgMaxs = aboveAvgMaxs;
 		this.belowAvgMins = belowAvgMins;
+		this.date = date;
 	}
 	
 
@@ -93,6 +104,6 @@ public class CodeResult {
 			belowAvgMinsStr.append(DateUtil.getStr(s.getDate())).append(" ").append(s.getClose()).append(" ");
 		});
 		
-		return sb.append("code:").append(code).append(" daysNumber:").append(numberOfDays).append(" avg:").append(avg).append(" max:").append(max).append(" min:").append(min).append(" aboveAvgMaxs").append(aboveAvgMaxs.size()).append(" belowAvgMins:").append(belowAvgMins.size()).append("\n").append(" aboveAvgMaxs:").append(aboveAvgMaxsStr.toString()).append("\n").append(" belowAvgMins:").append(belowAvgMinsStr.toString()).toString();
+		return sb.append("code:").append(code).append(" date:").append(date).append(" daysNumber:").append(numberOfDays).append(" avg:").append(avg).append(" max:").append(max).append(" min:").append(min).append(" aboveAvgMaxs").append(aboveAvgMaxs.size()).append(" belowAvgMins:").append(belowAvgMins.size()).append("\n").append(" aboveAvgMaxs:").append(aboveAvgMaxsStr.toString()).append("\n").append(" belowAvgMins:").append(belowAvgMinsStr.toString()).toString();
 	}
 }

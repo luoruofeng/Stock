@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum Day {
 
-	FIVE(5),TEN(10),TWENTY(20),THIRTY(30),SIXTY(60),NINETY(90),HALF_YEAR(180),YEAR(360);
+	FIVE(5),TEN(10);//,TWENTY(20),THIRTY(30),SIXTY(60),NINETY(90),HALF_YEAR(180),YEAR(360);
 	
 	public Integer value;
 	

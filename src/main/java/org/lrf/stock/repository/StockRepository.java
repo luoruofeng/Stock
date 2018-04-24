@@ -88,5 +88,10 @@ public class StockRepository {
 	return mongoTemplate.findOne(Query.query(Criteria.where("code").is(code))
 				.with(new Sort(new Sort.Order(Sort.Direction.DESC, "date"))).limit(1), Stock.class);
 	}
+	
+	public Stock getFirstStock(String code) {
+		return mongoTemplate.findOne(Query.query(Criteria.where("code").is(code))
+					.with(new Sort(new Sort.Order(Sort.Direction.ASC, "date"))).limit(1), Stock.class);
+		}
 
 }

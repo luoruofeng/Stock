@@ -183,6 +183,7 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpRequestBase request = createHttpUriRequestWithOutUrl();
 
+		
 		codeRepository.findAll().forEach(code -> {
 			if (code == null || code.getStartDate() == null)
 				return;

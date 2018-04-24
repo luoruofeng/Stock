@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.lrf.stock.entity.Code;
-import org.lrf.stock.entity.Stock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,7 +19,6 @@ public class CodeRepository{
 	
 	public List<Code> findAll(){
 		return mongoTemplate.findAll(Code.class);
-
 	}
 	
 	public void saveCodes(List<Code> codes) {

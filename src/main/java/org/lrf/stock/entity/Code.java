@@ -29,7 +29,6 @@ public class Code {
 	private String name;
 	private String code;
 	private Date startDate;
-	private Map<Integer, CodeResult> codeResults; 
 	private MonthInfo monthInfo;
 	
 	public String getId() {
@@ -57,18 +56,6 @@ public class Code {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
-	}
-
-	public Map<Integer, CodeResult> getCodeResults() {
-		return codeResults;
-	}
-
-	public void setCodeResults(Map<Integer, CodeResult> codeResults) {
-		this.codeResults = codeResults;
-	}
-	
-	public void cleanCodeResults() {
-		this.setCodeResults(new HashMap<Integer, CodeResult>());
 	}
 
 	public MonthInfo getMonthInfo() {

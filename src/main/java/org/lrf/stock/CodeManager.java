@@ -28,7 +28,6 @@ public class CodeManager implements CommandLineRunner {
 		//给刚才所有以保存的code设置上市日期
 		//stockService.setAllStockStartTime();
 			
-		
 		//下载刚才excel历史记录
 		//stockService.downloadAllExcelFilesAndSaveExcel();
 		
@@ -43,9 +42,6 @@ public class CodeManager implements CommandLineRunner {
 		
 		//计算codeResult
 		codeResultService.saveAllCodeResult();
-		
-		//test get new stock 
-		//stockService.saveNoRecordStock();
 		
 		//dwq
 		//stockService.downloadRestExcelFilesAndSaveExcel();

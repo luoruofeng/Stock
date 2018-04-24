@@ -1,4 +1,4 @@
-package org.lrf.stock.entity;
+package org.lrf.stock.service.calculator;
 
 import java.util.Collections;
 import java.util.Date;
@@ -9,6 +9,9 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import org.lrf.stock.comparable.StockCloseComparable;
+import org.lrf.stock.entity.Code;
+import org.lrf.stock.entity.CodeResult;
+import org.lrf.stock.entity.Stock;
 import org.lrf.stock.util.DateUtil;
 import org.lrf.stock.util.Day;
 
@@ -16,6 +19,7 @@ public class CodeResultCalculator {
 	private List<Stock> stocks;
 	private Day day;
 	private Code code;
+	private Date calculatorDate;
 	private Date startDate;
 	private CodeResult codeResult;
 	private Double avg;
@@ -25,7 +29,7 @@ public class CodeResultCalculator {
 	private List<Stock> belowAvgMins;
 	private Predicate<Stock> afterStartDatePredicate;
 
-	public CodeResultCalculator(List<Stock> allStocks, Day day, Code code, Date startDate) {
+	public CodeResultCalculator(List<Stock> allStocks, Day day, Code code, Date startDate,Date date) {
 		
 		/**
 		 * 给参数赋值
@@ -33,6 +37,7 @@ public class CodeResultCalculator {
 		this.day = day;
 		this.code = code;
 		this.startDate = startDate;
+		this.calculatorDate = date;
 
 		/**
 		 * 创建 code result
@@ -65,7 +70,7 @@ public class CodeResultCalculator {
 	}
 
 	private CodeResult createCodeResult(String code, int numberOfDays) {
-		return new CodeResult(code, numberOfDays);
+		return new CodeResult(code, numberOfDays,calculatorDate);
 	}
 
 	private List<Stock> getStockesFromStartDate(List<Stock> allStocks) {
