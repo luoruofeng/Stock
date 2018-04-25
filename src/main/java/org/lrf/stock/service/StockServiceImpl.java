@@ -257,10 +257,12 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 	}
 
 	public void dropAllStock() {
+		System.out.println("----------------- drop stock collection -----------------");
 		stockRepository.dropCollection();
 	}
 	
 	public void saveAllCSVToDB() {
+		System.out.println("----------------- save All CSV To DB -----------------");
 		transformCSVToEntity(this.excelDir,true);
 	}
 	

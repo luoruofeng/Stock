@@ -212,7 +212,7 @@ public class Stock {
 		this.vol = new Long(checkNone(vol));
 		this.GMV = new Double(checkNone(gMV));
 		this.totalValue = stringToLong(checkNone(totalValue));
-		this.circulationMarketValue = new Long(circulationMarketValue);
+		this.circulationMarketValue = stringToLong(circulationMarketValue.toString());
 		setCaculateAmplitude();
 	}
 	
@@ -268,6 +268,4 @@ public class Stock {
 		}
 		setAmplitude(new Double(new DecimalFormat(AMPLITUDE_FORMAT).format((this.high-this.low)/this.high)));
 	}
-	
-	
 }
