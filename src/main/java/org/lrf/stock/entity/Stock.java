@@ -198,7 +198,6 @@ public class Stock {
 			String previousClose, String changeAmount, String changeRate, String turnoverRate, String vol, String gMV,
 			String totalValue, String circulationMarketValue) {
 		super();
-		System.out.println("*");
 		setDate(formatDate(date));
 		this.code = (code != null) ? code.substring(1) : "";
 		this.name = name;
@@ -213,6 +212,7 @@ public class Stock {
 		this.vol = new Long(checkNone(vol));
 		this.GMV = new Double(checkNone(gMV));
 		this.totalValue = stringToLong(checkNone(totalValue));
+		this.circulationMarketValue = new Long(circulationMarketValue);
 		setCaculateAmplitude();
 	}
 	

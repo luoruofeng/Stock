@@ -34,7 +34,6 @@ public class CsvBasicMapper<T> {
 
 		Class[] argsClass = argsClassList.toArray(new Class[args.length]);
 		
-		
 		try {
 			T result = (T) t.getClass().getConstructor(argsClass).newInstance(args);
 			//System.out.println("create stock ----- "+result.toString());

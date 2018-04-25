@@ -32,13 +32,13 @@ public class CodeManager implements CommandLineRunner {
 		//stockService.downloadAllExcelFilesAndSaveExcel();
 		
 		//删除DB中的所有stock
-		//stockService.dropAllStock();
+		stockService.dropAllStock();
 		
 		//把Excel转对象，进行保存
-		//stockService.saveAllCSVToDB();
+		stockService.saveAllCSVToDB();
 		
 		//对stock对象里面的code建立索引
-		//stockService.createStockIndex();
+		stockService.createStockIndex();
 		
 		//计算codeResult
 		codeResultService.saveAllCodeResult();
