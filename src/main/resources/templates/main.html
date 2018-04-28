@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="index::common_body(~{::content},~{::head},'主页',~{})">
+<head>
+
+<script src="../js/highcharts.js"></script>
+<script src="../js/exporting.js"></script>
+<script src="../js/oldie.js"></script>
+<script src="../js/series-label.js"></script>
+<script type="text/javascript" src="../js/jquery.dragsort-0.5.2.js"></script>
+<!-- 柱子图-->
+
+<script type="text/javascript">
+	function monthImage() {
+		var chart = {
+			type : 'column'
+		};
+		var title = {
+			text : '每月视频总点击量'
+		};
+
+		var xAxis = {
+			categories : [ '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月',
+					'九月', '十月', '十一月', '十二月' ],
+			crosshair : true
+		};
+		var yAxis = {
+			min : 0,
+			title : {
+				text : '数量'
+			}
+		};
+		var tooltip = {
+			headerFormat : '<span style="font-size:10px">{point.key}</span><table>',
+			pointFormat : '<tr><td style="color:{series.color};padding:0">{series.name}: </td>'
+					+ '<td style="padding:0"><b>{point.y:.1f} 次</b></td></tr>',
+			footerFormat : '</table>',
+			shared : true,
+			useHTML : true
+		};
+		var plotOptions = {
+			column : {
+				pointPadding : 0.2,
+				borderWidth : 0
+			}
+		};
+		var credits = {
+			enabled : false
+		};
+
+		var series = [ {
+
+			name : '点击量',
+			data : [ 23, 43, 123, 23, 999, 64, 12, 32, 44, 12, 77, 86 ]
+		} ];
+
+		var json = {};
+		json.chart = chart;
+		json.title = title;
+
+		json.tooltip = tooltip;
+		json.xAxis = xAxis;
+		json.yAxis = yAxis;
+		json.series = series;
+		json.plotOptions = plotOptions;
+		json.credits = credits;
+
+		Highcharts.chart('container', json);
+	}
+
+	function dateImage() {
+		var chart = {
+			type : 'column'
+		};
+		var title = {
+			text : '最近30天每日视频点击量'
+		};
+
+		var xAxis = {
+			categories : [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+					'11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+					'21', '22', '23', '24', '25', '26', '27', '28', '29', '30' ],
+			crosshair : true
+		};
+		var yAxis = {
+			min : 0,
+			title : {
+				text : '数量'
+			}
+		};
+		var tooltip = {
+			headerFormat : '<span style="font-size:10px">{point.key}</span><table>',
+			pointFormat : '<tr><td style="color:{series.color};padding:0">{series.name}: </td>'
+					+ '<td style="padding:0"><b>{point.y:.1f} 次</b></td></tr>',
+			footerFormat : '</table>',
+			shared : true,
+			useHTML : true
+		};
+		var plotOptions = {
+			column : {
+				pointPadding : 0.2,
+				borderWidth : 0
+			}
+		};
+		var credits = {
+			enabled : false
+		};
+
+		var series = [ {
+
+			name : '点击量',
+			data : [ 23, 43, 123, 23, 999, 64, 12, 32, 44, 12, 77, 86, 86, 86,
+					86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86,
+					86 ]
+		} ];
+
+		var json = {};
+		json.chart = chart;
+		json.title = title;
+
+		json.tooltip = tooltip;
+		json.xAxis = xAxis;
+		json.yAxis = yAxis;
+		json.series = series;
+		json.plotOptions = plotOptions;
+		json.credits = credits;
+		Highcharts.chart('container2', json);
+	}
+
+	$(document).ready(function() {
+		monthImage();
+		dateImage();
+	});
+	
+</script>
+</head>
+<body class="flat-blue">
+	<div id="luoruofeng" class="container-fluid" th:fragment="content">
+		<!-- luoruofeng -->
+		<div class="side-body padding-top">
+			<div class="row">
+				<div class="col-md-12 column">
+					<h2 class="text-success text-center">视频类型</h2>
+				</div>
+
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<a href="#">
+						<div class="card red summary-inline">
+							<div class="card-body">
+								<i class="fa fa-2x">SpringBoot</i>
+								<div class="content">
+									<div class="fa-3x">666</div>
+									<div class="sub-title">点击量</div>
+								</div>
+								<div class="clear-both"></div>
+							</div>
+						</div>
+					</a>
+				</div>
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<a href="#">
+						<div class="card yellow summary-inline">
+							<div class="card-body">
+								<i class="fa fa-2x">MongoDB</i>
+								<div class="content">
+									<div class="fa-3x">666</div>
+									<div class="sub-title">点击量</div>
+								</div>
+								<div class="clear-both"></div>
+							</div>
+						</div>
+					</a>
+				</div>
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<a href="#">
+						<div class="card green summary-inline">
+							<div class="card-body">
+								<i class="fa fa-2x">Redis</i>
+								<div class="content">
+									<div class="fa-3x">666</div>
+									<div class="sub-title">点击量</div>
+								</div>
+								<div class="clear-both"></div>
+							</div>
+						</div>
+					</a>
+				</div>
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<a href="#">
+						<div class="card blue summary-inline">
+							<div class="card-body">
+								<i class=" fa fa-2x">MySQL</i>
+								<div class="content">
+									<div class="fa-3x">666</div>
+									<div class="sub-title">点击量</div>
+								</div>
+								<div class="clear-both"></div>
+							</div>
+						</div>
+					</a>
+				</div>
+
+			</div>
+			<div class="row  no-margin-bottom">
+				<!--	柱状图-->
+				<div class="col-md-12 column" id="container" style="height: 300px"></div>
+				<div class="col-md-12 column" id="container2" style="height: 300px"></div>
+
+				<!--视频列表-->
+				<div class="col-sm-12 col-xs-12">
+
+					<div class="row">
+						
+								<div class="col-md-3 col-sm-12">
+									<div class="thumbnail no-margin-bottom">
+										<img src="../img/thumbnails/picjumbo.com_IMG_3241.jpg"
+											class="img-responsive" />
+										<div class="caption">
+											<h3 id="thumbnail-label">学习MySQL的第1步</h3>
+
+											<h4 class="text-success text-right">点击率：9999</h4>
+											<p>作者：罗若锋</p>
+											<p>简介：奥术大师大所奥术大师大所所奥术大师大</p>
+											<p>
+												<a href="#" class="btn btn-success" role="button">点击播放</a>
+											</p>
+										</div>
+									</div>
+								</div>
+							
+								<div class="col-md-3 col-sm-12">
+									<div class="thumbnail no-margin-bottom">
+										<img src="../img/thumbnails/picjumbo.com_IMG_3241.jpg"
+											class="img-responsive" />
+										<div class="caption">
+											<h3 id="thumbnail-label">学习MySQL的第2步</h3>
+
+											<h4 class="text-success text-right">点击率：9999</h4>
+											<p>作者：罗若锋</p>
+											<p>简介：奥术大师大所奥术大师大所所奥术大师大</p>
+											<p>
+												<a href="#" class="btn btn-success" role="button">点击播放</a>
+											</p>
+										</div>
+									</div>
+								</div>
+							
+								<div class="col-md-3 col-sm-12">
+
+									<div class="thumbnail no-margin-bottom">
+										<img src="../img/thumbnails/picjumbo.com_IMG_3241.jpg"
+											class="img-responsive" />
+										<div class="caption">
+											<h3 id="thumbnail-label">学习MySQL的第3步</h3>
+
+											<h4 class="text-success text-right">点击率：9999</h4>
+											<p>作者：罗若锋</p>
+											<p>简介：奥术大师大所奥术大师大所所奥术大师大</p>
+											<p>
+												<a href="#" class="btn btn-success" role="button">点击播放</a>
+											</p>
+										</div>
+									</div>
+								</div>
+							
+								<div class="col-md-3 col-sm-12">
+
+									<div class="thumbnail no-margin-bottom">
+										<img src="../img/thumbnails/picjumbo.com_IMG_3241.jpg"
+											class="img-responsive" />
+										<div class="caption">
+											<h3 id="thumbnail-label">学习MySQL的第4步</h3>
+
+											<h4 class="text-success text-right">点击率：9999</h4>
+											<p>作者：罗若锋</p>
+											<p>简介：奥术大师大所奥术大师大所所奥术大师大</p>
+											<p>
+												<a href="#" class="btn btn-success" role="button">点击播放</a>
+											</p>
+										</div>
+									</div>
+								</div>
+						
+								<div class="col-md-3 col-sm-12">
+									<div class="thumbnail no-margin-bottom">
+										<img src="../img/thumbnails/picjumbo.com_IMG_3241.jpg"
+											class="img-responsive" />
+										<div class="caption">
+											<h3 id="thumbnail-label">学习MySQL的第5步</h3>
+
+											<h4 class="text-success text-right">点击率：9999</h4>
+											<p>作者：罗若锋</p>
+											<p>简介：奥术大师大所奥术大师大所所奥术大师大</p>
+											<p>
+												<a href="#" class="btn btn-success" role="button">点击播放</a>
+											</p>
+										</div>
+									</div>
+								</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

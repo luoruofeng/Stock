@@ -30,7 +30,7 @@ public class DateUtil {
 		stocks.sort(new StockDateComparable());
 		
 		if(stocks.size() < dayNumber)
-			return null;
+			return stocks.get(stocks.size()-1).getDate();
 		return stocks.get(dayNumber-1).getDate();
 	}
 	

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="index::common_body(~{::content},~{::head},'主页',~{})">
+<head>
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		$("#end_date").val(getFormatedDate(new Date()));
+		$("#start_date").val(getFormatedDate(add(new Date(), "m", -1)));
+	});
+
+	/** 
+	 *js中更改日期  
+	 * y年， m月， d日， h小时， n分钟，s秒  
+	 */
+	function add(date, part, value) {
+		value *= 1;
+		if (isNaN(value)) {
+			value = 0;
+		}
+		switch (part) {
+		case "y":
+			date.setFullYear(date.getFullYear() + value);
+			break;
+		case "m":
+			date.setMonth(date.getMonth() + value);
+			break;
+		case "d":
+			date.setDate(date.getDate() + value);
+			break;
+		case "h":
+			date.setHours(date.getHours() + value);
+			break;
+		case "n":
+			date.setMinutes(date.getMinutes() + value);
+			break;
+		case "s":
+			date.setSeconds(date.getSeconds() + value);
+			break;
+		default:
+		}
+		return date;
+	}
+
+	function get2Position(num) {
+		return num < 10 ? "0" + num : num;
+	}
+
+	function getFormatedDate(date) {
+		if (date == null)
+			return;
+		return date.getFullYear() + "-" + get2Position(date.getMonth() + 1)
+				+ "-" + get2Position(date.getDate());
+	}
+
+	function getDateFromStr(dateStr) {
+		var array = dateStr.split("-");
+		return new Date(array[0], array[1], array[2]);
+	}
+
+	function getData() {
+		$.ajax({
+			method : "POST",
+			url : "/coderesults",
+			data : {
+				"keyWord" : $("#code_input").val(),
+				"startDate" : getDateFromStr($("#start_date").val()),
+				"endDate" : getDateFromStr($("#end_date").val())
+			},
+			success : function(result) {
+				if(result.message != null){
+					alert(result.message);
+				}
+				
+				if(result.codeResults != null && result.codeResults.length > 0){
+					var tr = $("<tr></tr>");
+					for(var index in result.codeResults){
+						tr.html($("<td></td>").append(result.codeResults[index]));
+					}
+					
+					$("#code_result_table_content").append(tr);
+				}
+			},
+			error : function() {
+				alert("error!!!!");
+			}
+		});
+	}
+</script>
+</head>
+<body class="flat-blue">
+	<div id="content" th:fragment="content">
+
+
+		<div class="row">
+			<div class="col-md-12">
+				<form class="form-inline">
+					<div class="form-group">
+						<label for="code_input">key word</label> <input type="text"
+							class="form-control" id="code_input" placeholder="input code">
+					</div>
+
+					&nbsp;&nbsp;&nbsp;
+
+					<div class="form-group">
+						<label for="start_date">start date</label> <input type="date"
+							class="form-control" id="start_date">
+					</div>
+
+					&nbsp;&nbsp;&nbsp;
+
+					<div class="form-group">
+						<label for="end_date">end date</label> <input type="date"
+							class="form-control" id="end_date">
+					</div>
+
+					&nbsp;&nbsp;&nbsp;
+
+					<button type="submit" class="btn btn-default" onclick="getData()">GET</button>
+				</form>
+
+			</div>
+		</div>
+
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-default">
+					<!-- Default panel contents -->
+					<div class="panel-heading">CODE RESULT</div>
+					<div class="panel-body">
+						<p>Search code result that between start date and end date by
+							code or name !!!</p>
+					</div>
+
+					<!-- Table -->
+					<table class="table">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>code</th>
+								<th>date</th>
+								<th>numberOfDays</th>
+								<th>avg</th>
+								<th>min</th>
+								<th>max</th>
+								<th>close</th>
+							</tr>
+						</thead>
+						<tbody id="code_result_table_content">
+							<tr>
+								<th scope="row">1</th>
+								<td>Mark</td>
+								<td>Otto</td>
+								<td>@mdo</td>
+								<td>Mark</td>
+								<td>Otto</td>
+								<td>@mdo</td>
+								<td>@mdo</td>
+							</tr>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

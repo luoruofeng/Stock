@@ -19,6 +19,7 @@ public class CodeResult {
 	private Double min;
 	private List<Stock> aboveAvgMaxs;
 	private List<Stock> belowAvgMins;
+	private Double close;
 	
 	public Date getDate() {
 		return date;
@@ -69,11 +70,19 @@ public class CodeResult {
 	public void setBelowAvgMins(List<Stock> belowAvgMins) {
 		this.belowAvgMins = belowAvgMins;
 	}
-	public CodeResult(String code, int numberOfDays,Date calculatorDate) {
+	
+	public Double getClose() {
+		return close;
+	}
+	public void setClose(Double close) {
+		this.close = close;
+	}
+	public CodeResult(String code, int numberOfDays,Date calculatorDate,Double close) {
 		super();
 		this.code = code;
 		this.numberOfDays = numberOfDays;
 		this.date = calculatorDate;
+		this.close = close;
 	}
 	
 	public CodeResult(String code, int numberOfDays, Double avg, Double max, Double min, List<Stock> aboveAvgMaxs,

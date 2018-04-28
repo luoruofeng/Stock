@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="index::common_body(~{::body},~{::head},'视频管理','视频')">
+
+<head>
+</head>
+<body class="flat-blue">
+
+	<!-- Main Content -->
+		<div class="side-body">
+			<div class="page-title">
+				<span class="title">视频管理</span>
+
+			</div>
+
+			<div class="container">
+				<div class="row clearfix">
+					<div class="col-md-12 column">
+						<div class="tabbable" id="tabs-860866">
+							<div class="tab-content">
+								<div class="tab-pane active" id="panel-813062">
+
+									<!--第一栏-->
+									<table class="datatable table table-striped">
+										<thead>
+											<tr>
+												<th>序号</th>
+												<th>视频</th>
+												<th>上传时间</th>
+												<th>播放</th>
+												<th>预览</th>
+												<th>修改</th>
+												<th>删除</th>
+												<th>是否可见</th>
+											</tr>
+										</thead>
+										<tbody>
+										
+											<tr th:each="video:${videos}">
+												<td th:text="${video._id}">1</td>
+												<td th:text="${video.name}">TB - Monthly</td>
+												<td th:text="${video.createtime}">2018.01.01</td>
+												<td><a href="#" class="btn btn-success" role="button">播放</a></td>
+												<td>
+													<button class="btn btn-success btn-sm" data-toggle="modal"
+														data-target="#myModal">预览</button>
+												</td>
+
+												<td>
+													<button class="btn btn-primary btn-sm" data-toggle="modal"
+														data-target="#myModal">修改</button>
+												</td>
+					
+												<td>
+													<button class="btn btn-primary btn-sm" data-toggle="modal"
+														data-target="#myModal">删除</button>
+												</td>
+												
+												<td>
+													<div class="switch" data-on="primary" data-off="info">
+														<input type="checkbox" name="my-checkbox" checked>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+
+
+				<div class="tabbable" id="tabs-422893">
+					<ul class="nav nav-tabs">
+						<li><a href="#panel-586185" data-toggle="tab">删除</a></li>
+						<li class="active"><a href="#panel-267652" data-toggle="tab">修改</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane" id="panel-586185">
+							<div class="modal-footer">
+								<form role="form">
+
+									<div class="form-group">
+										<button type="button" class="btn btn-default"
+											data-dismiss="modal">关闭</button>
+										<button type="button" class="btn btn-primary">确定删除</button>
+									</div>
+								</form>
+
+
+							</div>
+						</div>
+						<div class="tab-pane active" id="panel-267652">
+
+
+							<div class="modal-footer">
+								<form role="form">
+									<div class="form-group">
+										<p>修改视频名字</p>
+										<input type="text" class="form-control" id="" />
+									</div>
+
+									<div class="form-group">
+										<label>增加文档</label> <input id="file-1" type="file"
+											multiple=true>
+									</div>
+
+									<div class="form-group">
+										<button type="button" class="btn btn-default"
+											data-dismiss="modal">关闭</button>
+										<button type="button" class="btn btn-primary">提交更改</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+</body>
+<script type="text/javascript">
+	$("[name='my-checkbox']").bootstrapSwitch();
+
+	$("#file-1").fileinput({
+		showUpload : false,
+		showCaption : false,
+		allowedFileExtensions : [ 'txt', 'docx', 'pdf' ],
+		browseClass : "btn btn-primary btn-lg",
+		fileType : "any",
+		previewFileIcon : "<i class='glyphicon glyphicon-king'></i>"
+	});
+</script>
+</html>

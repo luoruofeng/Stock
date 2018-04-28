@@ -1,6 +1,7 @@
 package org.lrf.stock;
 
-import org.lrf.stock.service.CodeResultService;
+import org.lrf.stock.repository.StockRepository;
+import org.lrf.stock.service.CodeResultServiceImpl;
 import org.lrf.stock.service.CodeService;
 import org.lrf.stock.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +19,22 @@ public class CodeManager implements CommandLineRunner {
 	private StockService stockService;
 	
 	@Autowired
-	private CodeResultService codeResultService;
+	private CodeResultServiceImpl codeResultService;
 	
+	@Autowired
+	private StockRepository  stockRepository;
 	@Override
 	public void run(String... args) throws Exception {
+		
+		/**
 		//把所有的股票存起来
-		//codeService.writeCodeToFile();
+		codeService.writeCodeToFile();
 		
 		//给刚才所有以保存的code设置上市日期
-		//stockService.setAllStockStartTime();
+		stockService.setAllStockStartTime();
 			
 		//下载刚才excel历史记录
-		//stockService.downloadAllExcelFilesAndSaveExcel();
+		stockService.downloadAllExcelFilesAndSaveExcel();
 		
 		//删除DB中的所有stock
 		stockService.dropAllStock();
@@ -44,10 +49,15 @@ public class CodeManager implements CommandLineRunner {
 		codeResultService.saveAllCodeResult();
 		
 		//dwq
-		//stockService.downloadRestExcelFilesAndSaveExcel();
-		//stockService.saveTempCSVToDB();
+		stockService.downloadRestExcelFilesAndSaveExcel();
+		stockService.saveTempCSVToDB();
+	
 		
+		*/
 		
-		
+		//计算codeResult
+		codeResultService.saveAllCodeResult();
 	}
+
+	
 }

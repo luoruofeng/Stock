@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:fragment="common_body(content,head,first_title,second_title)">
+
+<head>
+<title>撸啪撸管理</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+	
+	<!-- 公用css -->
+	<th:block th:replace="css::head" />
+	<!-- 公用js -->
+	<th:block th:replace="js::head" />
+	<!-- 传入head -->
+	<th:block th:replace="${head}" />
+
+</head>
+<body class="flat-blue">
+	<div class="app-container">
+		<div class="row content-container">
+			<!-- 网页的头片段 -->
+			<div th:replace="head::body"></div>
+			<!-- 网页的导航片段 -->
+			<div th:replace="nav::body"></div>
+			<div class="container-fluid" id="content_wrap">
+				<!-- 传入的内容 -->
+				<th:block th:replace="${content}" />
+			</div>
+		</div>
+		<!-- 网页的尾片段 -->
+		<div th:replace="footer::body"></div>
+	</div>
+</body>
+
+</html>

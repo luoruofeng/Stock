@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -289,6 +290,16 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 			e.printStackTrace();
 		}
 	}
+	
+	private List<Stock> filterEliminateEmpty(List<Stock> stocks){
+		return stocks.stream().filter(s->{return !(s.getClose() == 0);}).collect(Collectors.toList());
+	}
+	
+	private List<Stock> distinctRepeatDate(List<Date> existStocksDate,List<Stock> stocks) {
+		return stocks.stream().filter(newStock->{
+			return !existStocksDate.contains(newStock.getDate());
+		}).collect(Collectors.toList());
+	}
 
 	public void saveAllStocksFromCsv(CountDownLatch countDownLatch) {
 		if (csvFiles == null) {
@@ -299,10 +310,26 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 
 		for (int i = 0; i < csvFiles.length; i++) {
 			final int temp = i;
+			System.out.println(this);
 			es.execute(() -> {
+				System.out.println(this);
 				try {
-					stockRepository.saveStocks(
-							CsvUtil.readCSV(new XTableEntityFactory<>(), csvFiles[temp], 1, 0, new Stock()));
+					List<Stock> stocks = CsvUtil.readCSV(new XTableEntityFactory<>(), csvFiles[temp], 1, 0, new Stock());
+					if(stocks == null || stocks.isEmpty())
+						return;
+					
+					List<Date> existStocksDate = stockRepository.getStocksEntityByStock(stocks.get(0).getCode()).stream().map(stock->{return stock.getDate();}).collect(Collectors.toList());
+					
+					if(existStocksDate != null && stocks != null && !existStocksDate.isEmpty() && !stocks.isEmpty() )
+						stocks = distinctRepeatDate(existStocksDate, stocks);
+					
+
+					stocks = filterEliminateEmpty(stocks);
+					
+					stockRepository.saveStocks(stocks);
+					stocks.forEach(stock->{
+						System.out.println("save stock to db code:"+ stock.getCode() + "   date:" + stock.getDate());						
+					});
 				} catch (Exception e) {
 					System.out.println(e);
 				}

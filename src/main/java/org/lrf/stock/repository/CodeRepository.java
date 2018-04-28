@@ -33,6 +33,11 @@ public class CodeRepository{
 		return mongoTemplate.findOne(Query.query(Criteria.where("code").is(code)), Code.class);
 	}
 	
+	public Code getCodeByName(String name) {
+		return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), Code.class);
+	}
+	
+	
 	public void saveOrUpdateCode(Code code) {
 		mongoTemplate.save(code);
 	}

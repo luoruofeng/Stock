@@ -1,5 +1,6 @@
 package org.lrf.stock.service.calculator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
+
+import javax.management.RuntimeErrorException;
 
 import org.lrf.stock.comparable.StockCloseComparable;
 import org.lrf.stock.entity.Code;
@@ -17,6 +20,7 @@ import org.lrf.stock.util.Day;
 
 public class CodeResultCalculator {
 	private List<Stock> stocks;
+	private Stock currentStock;
 	private Day day;
 	private Code code;
 	private Date calculatorDate;
@@ -39,24 +43,20 @@ public class CodeResultCalculator {
 		this.startDate = startDate;
 		this.calculatorDate = date;
 
-		/**
-		 * 创建 code result
-		 */
-		this.codeResult = createCodeResult(code.getCode(), day.value);
 
-		/**
-		 * 排序后 给stocks赋值
-		 */
+		//排序后 给stocks赋值
 		this.stocks = getStockesFromStartDate(allStocks);
 		
-		/**
-		 * 计算
-		 */
+		//获取并设置当天的stock
+		setCurrentStock();
+		
+		//创建 code result
+		this.codeResult = createCodeResult();
+
+		 //计算
 		caculateCodeResultContent();
 		
-		/**
-		 * code result 赋值
-		 */
+		//code result 赋值
 		setCodeResult();
 		
 		printAllStockesByCodeAndStartDate();
@@ -65,12 +65,20 @@ public class CodeResultCalculator {
 		System.out.println("\n");
 	}
 	
+	private void setCurrentStock() {
+		List<Stock> oneStockList =  this.stocks.stream().filter(s->{return s.getDate().equals(calculatorDate);}).collect(Collectors.toList());
+		if(oneStockList == null || oneStockList.isEmpty()) {
+			throw new RuntimeException("current day is not in stock list :"+calculatorDate.toString());
+		}
+		this.currentStock = oneStockList.get(0);
+	}
+	
 	public CodeResult getCodeResult() {
 		return this.codeResult;
 	}
 
-	private CodeResult createCodeResult(String code, int numberOfDays) {
-		return new CodeResult(code, numberOfDays,calculatorDate);
+	private CodeResult createCodeResult() {
+		return new CodeResult(code.getCode() , day.value ,calculatorDate,this.currentStock.getClose());
 	}
 
 	private List<Stock> getStockesFromStartDate(List<Stock> allStocks) {
@@ -189,6 +197,7 @@ public class CodeResultCalculator {
 	}
 
 	private void setAvg() {
+		Double test =stocks.stream().mapToDouble(s->{return s.getClose();}).summaryStatistics().getAverage();
 		this.avg = getFilterStockCloseStream(getAfterStartDatePredicate()).summaryStatistics().getAverage();
 	}
 	
@@ -234,4 +243,6 @@ public class CodeResultCalculator {
 		setBelowAvgMins();
 	}
 
+
+	
 }

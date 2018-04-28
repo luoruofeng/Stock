@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="index::common_body(~{::body},~{::head},'视频管理','新增视频')">
+<head>
+		
+<!-- 视频 -->
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script type="text/javascript" src="fileupload/js/vendor/jquery.ui.widget.js"></script>
+<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+<script type="text/javascript" src="fileupload/js/load-image.all.min.js"></script>
+<!-- The Canvas to Blob plugin is included for image resizing functionality -->
+<script type="text/javascript" src="fileupload/js/canvas-to-blob.min.js"></script>
+<!-- Bootstrap JS is not required, but included for the responsive demo navigation -->
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script type="text/javascript" src="fileupload/js/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script type="text/javascript" src="fileupload/js/jquery.fileupload.js"></script>
+<!-- The File Upload processing plugin -->
+<script type="text/javascript" src="fileupload/js/jquery.fileupload-process.js"></script>
+<!-- The File Upload image preview & resize plugin -->
+<script type="text/javascript" src="fileupload/js/jquery.fileupload-image.js"></script>
+<!-- The File Upload audio preview plugin -->
+<script type="text/javascript" src="fileupload/js/jquery.fileupload-audio.js"></script>
+<!-- The File Upload video preview plugin -->
+<script type="text/javascript" src="fileupload/js/jquery.fileupload-video.js"></script>
+<!-- The File Upload validation plugin -->
+<script type="text/javascript" src="fileupload/js/jquery.fileupload-validate.js"></script>
+
+<script type="text/javascript">
+	/*<![CDATA[*/
+
+	var video_update_complete = false;
+
+	//提交视频
+	function submit_form() {
+
+		if (video_update_complete == false) {
+			$("#upload_button").click();
+			return false;
+		} else {
+			<!--判断表单是否为空-->
+			return true;
+		}
+
+	}
+
+	function startUploadEntity() {
+		if (videoUploaded == true && attachmentUploaded == true) {
+			console.log(true);
+			//上传对象
+		}
+	}
+
+	$(document).ready(function() {
+		///(\.|\/)(mp4|avi|remvb)$/i视频格式
+		fileUpload("fileupload", "/upload", null, "#files");
+
+	});
+
+	function fileUpload(fileupload_id, upload_url, accept_file_types,
+			target_div) {
+		var upload_button_id = "upload_button";
+
+		var uploadButton = $('<button id="'+upload_button_id+'"/>').addClass(
+				'btn btn-primary').prop('disabled', true)
+				.css('display', 'none').text('执行中...').on('click', function() {
+					var $this = $(this), data = $this.data();
+					$this.off('click').text('取消').on('click', function() {
+						$this.remove();
+						data.abort();
+					});
+					data.submit().always(function() {
+						$this.remove();
+					});
+					return false;
+				});
+
+		$(fileupload).fileupload(
+						{
+							url : upload_url,
+							autoUpload : false,
+							acceptFileTypes : accept_file_types,
+							disableImageResize : /Android(?!.*Chrome)|Opera/
+									.test(window.navigator.userAgent),
+							previewMaxWidth : 100,
+							previewMaxHeight : 100,
+							previewCrop : true
+						})
+				.on(
+						'fileuploadadd',
+						function(e, data) {
+							data.context = $('<div/>').appendTo(target_div);
+							$.each(data.files, function(index, file) {
+								var node = $('<p/>').append(
+										$('<span/>').text(file.name));
+								if (!index) {
+									node.append('<br>')
+											.append(
+													uploadButton.clone(true)
+															.data(data));
+								}
+								node.appendTo(data.context);
+							});
+						})
+				.on(
+						'fileuploadprocessalways',
+						function(e, data) {
+							var index = data.index, file = data.files[index], node = $(data.context
+									.children()[index]);
+							if (file.preview) {
+								node.prepend('<br>').prepend(file.preview);
+							}
+							if (file.error) {
+								node.append('<br>').append(
+										$('<span class="text-danger"/>').text(
+												file.error));
+							}
+							if (index + 1 === data.files.length) {
+								data.context.find('button').text('Upload')
+										.prop('disabled', !!data.files.error);
+							}
+						}).on(
+						'fileuploadprogressall',
+						function(e, data) {
+							var progress = parseInt(data.loaded / data.total
+									* 100, 10);
+							$('#progress .progress-bar').css('width',
+									progress + '%');
+						}).on('fileuploaddone', function(e, data) {
+					//data.context.append($("<span>").text(data.result)).append('<br>');
+					
+					//标识视频上传成功
+					video_update_complete = true;
+					//提交表单
+					entity_form.submit();
+				}).on(
+						'fileuploadfail',
+						function(e, data) {
+							//标识视频上传失败
+							video_update_complete = false;
+							
+							$.each(data.files, function(index) {
+								var error = $('<span class="text-danger"/>')
+										.text('文件上传失败');
+								location.reload();
+								
+								$(data.context.children()[index])
+										.append('<br>').append(error);
+							});
+						}).prop('disabled', !$.support.fileInput).parent()
+				.addClass($.support.fileInput ? undefined : 'disabled');
+	}
+
+	/*]]>*/
+</script>
+</head>
+<body>
+	<div class="side-body">
+		<div class="page-title">
+			<span class="title">上传视频</span>
+
+		</div>
+		<div class="container">
+			<div class="row clearfix">
+				<div class="col-md-12 column">
+
+					<!-- video -->
+					<!-- The fileinput-button span is used to style the file input field as button -->
+					<span class="btn btn-success fileinput-button"> <i
+						class="glyphicon glyphicon-plus"></i> <span>添加视频...</span> <!-- The file input field used as target for the file upload widget -->
+						<input id="fileupload" type="file" name="files[]" multiple="true" />
+					</span> <br /> <br />
+					<!-- The global progress bar -->
+					<div id="progress" class="progress">
+						<div class="progress-bar progress-bar-success"></div>
+					</div>
+					<!-- The container for the uploaded files -->
+					<div id="files" class="files"></div>
+
+					<!--提交表单-->
+					<form role="form" id="entity_form" action="/create_video"
+						method="post" onsubmit="return submit_form(this);">
+						<div class="form-group">
+							<label for="exampleInput">视频名字</label><input type="text"
+								class="form-control" id="exampleInput" name="videoname" />
+						</div>
+						<div class="form-group">
+							<label>视频简介</label>
+							<textarea class="form-control" rows="3" name="videoinformation"></textarea>
+						</div>
+
+
+						<div class="form-group">
+							<label for="name">选择类型</label> <select class="form-control"
+								name="kind">
+								<option>吃一坨大便</option>
+								<option>吃两坨大便</option>
+								<option>吃三坨大便</option>
+								<option>吃四坨大便</option>
+								<option>吃五坨大便</option>
+							</select>
+						</div>
+						<button type="submit" class="btn btn-default">提交</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

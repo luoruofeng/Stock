@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+@media only screen and (min-width: 769px) {
+	#content_wrap {
+		padding-left: 70px;
+	}
+}
+
+#content_wrap {
+		margin-top: 70px;
+}
