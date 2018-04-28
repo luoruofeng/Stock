@@ -72,13 +72,36 @@
 					alert(result.message);
 				}
 				
+				var tr;
+				
 				if(result.codeResults != null && result.codeResults.length > 0){
-					var tr = $("<tr></tr>");
+					
+					var id = 0;
 					for(var index in result.codeResults){
-						tr.html($("<td></td>").append(result.codeResults[index]));
+						tr = $("<tr></tr>");
+						var stock = result.codeResults[index];
+						
+						var $isNull=$("<th></th>").append(id+=1);
+						var $stockCode = $("<td></td>").append(stock.code);
+						var $stockDate = $("<td></td>").append(getFormatedDate(new Date(stock.date)));
+						var $numberOfDays= $("<td></td>").append(stock.numberOfDays);
+						var $min=$("<td></td>").append(stock.min);
+						var $max=$("<td></td>").append(stock.max);
+						var $avg=$("<td></td>").append(stock.avg);
+						var $close= $("<td></td>").append(stock.close);
+						
+						tr.append($isNull);
+						tr.append($stockCode);
+						tr.append($stockDate);
+						tr.append($numberOfDays);
+						tr.append($min);
+						tr.append($max);
+						tr.append($avg);
+						tr.append($close);
+
+						$("#code_result_table_content").append(tr);
 					}
 					
-					$("#code_result_table_content").append(tr);
 				}
 			},
 			error : function() {
@@ -94,7 +117,7 @@
 
 		<div class="row">
 			<div class="col-md-12">
-				<form class="form-inline">
+				<div class="form-inline">
 					<div class="form-group">
 						<label for="code_input">key word</label> <input type="text"
 							class="form-control" id="code_input" placeholder="input code">
@@ -117,7 +140,7 @@
 					&nbsp;&nbsp;&nbsp;
 
 					<button type="submit" class="btn btn-default" onclick="getData()">GET</button>
-				</form>
+				</div>
 
 			</div>
 		</div>
@@ -141,24 +164,13 @@
 								<th>code</th>
 								<th>date</th>
 								<th>numberOfDays</th>
-								<th>avg</th>
 								<th>min</th>
 								<th>max</th>
+								<th>avg</th>
 								<th>close</th>
 							</tr>
 						</thead>
 						<tbody id="code_result_table_content">
-							<tr>
-								<th scope="row">1</th>
-								<td>Mark</td>
-								<td>Otto</td>
-								<td>@mdo</td>
-								<td>Mark</td>
-								<td>Otto</td>
-								<td>@mdo</td>
-								<td>@mdo</td>
-							</tr>
-
 						</tbody>
 					</table>
 				</div>

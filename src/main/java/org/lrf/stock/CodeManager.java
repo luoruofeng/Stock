@@ -55,8 +55,6 @@ public class CodeManager implements CommandLineRunner {
 		
 		*/
 		
-		//计算codeResult
-		codeResultService.saveAllCodeResult();
 	}
 
 	
