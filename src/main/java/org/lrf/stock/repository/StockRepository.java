@@ -37,7 +37,7 @@ public class StockRepository {
 	public Stock createStock(DBObject object) {
 		Stock stock = new Stock();
 		stock.setId(object.get("_id").toString());
-		stock.setDate((Date)object.get("date"));
+		stock.setDate((Date) object.get("date"));
 		stock.setCode(object.get("code").toString());
 		stock.setName(object.get("name").toString());
 		stock.setClose(Double.parseDouble(object.get("close").toString()));
@@ -54,8 +54,8 @@ public class StockRepository {
 		stock.setCirculationMarketValue(Long.parseLong(object.get("circulationMarketValue").toString()));
 		stock.setCaculateAmplitude();
 		return stock;
-	}		
-	
+	}
+
 	public void saveStocks(List<Stock> stocks) {
 		mongoTemplate.insertAll(stocks);
 	}
@@ -70,14 +70,15 @@ public class StockRepository {
 
 	public List<Stock> getStocksEntityByStock(String code) {
 		DBObject dbObject = new BasicDBObject();
-		dbObject.put("code", code); 
+		dbObject.put("code", code);
 		DBCursor dbCursor = (DBCursor) mongoTemplate.getCollection("stock").find(dbObject).maxTime(8, TimeUnit.HOURS);
 		List<Stock> result = new ArrayList<>();
 		while (dbCursor.hasNext()) {
 			result.add(createStock(dbCursor.next()));
 		}
 		return result;
-		//return mongoTemplate.find(Query.query(Criteria.where("code").is(code)), Stock.class);
+		// return mongoTemplate.find(Query.query(Criteria.where("code").is(code)),
+		// Stock.class);
 	}
 
 	public void createIndex(String field) {
@@ -85,13 +86,18 @@ public class StockRepository {
 	}
 
 	public Stock getLastStock(String code) {
-	return mongoTemplate.findOne(Query.query(Criteria.where("code").is(code))
+		return mongoTemplate.findOne(Query.query(Criteria.where("code").is(code))
 				.with(new Sort(new Sort.Order(Sort.Direction.DESC, "date"))).limit(1), Stock.class);
 	}
-	
+
 	public Stock getFirstStock(String code) {
 		return mongoTemplate.findOne(Query.query(Criteria.where("code").is(code))
-					.with(new Sort(new Sort.Order(Sort.Direction.ASC, "date"))).limit(1), Stock.class);
-		}
+				.with(new Sort(new Sort.Order(Sort.Direction.ASC, "date"))).limit(1), Stock.class);
+	}
 
+	public List<Stock> getStockByCodeAndPeriod(String code, Date startDate,Date endDate){
+		Criteria criteria = Criteria.where("code").is(code).and("date").gte(startDate).lte(endDate);
+		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "date"));
+		return mongoTemplate.find(Query.query(criteria).with(sort), Stock.class);
+	}
 }

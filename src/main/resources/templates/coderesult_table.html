@@ -2,6 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	th:replace="index::common_body(~{::content},~{::head},'主页',~{})">
 <head>
+<script src="../js/echarts.min.js"></script>
+
+
 <script type="text/javascript">
 	$(document).ready(function() {
 
@@ -55,59 +58,382 @@
 
 	function getDateFromStr(dateStr) {
 		var array = dateStr.split("-");
-		return new Date(array[0], array[1], array[2]);
+		return new Date(array[0], array[1] - 1, array[2]);
 	}
 
 	function getData() {
-		$.ajax({
-			method : "POST",
-			url : "/coderesults",
-			data : {
-				"keyWord" : $("#code_input").val(),
-				"startDate" : getDateFromStr($("#start_date").val()),
-				"endDate" : getDateFromStr($("#end_date").val())
-			},
-			success : function(result) {
-				if(result.message != null){
-					alert(result.message);
-				}
-				
-				var tr;
-				
-				if(result.codeResults != null && result.codeResults.length > 0){
-					
-					var id = 0;
-					for(var index in result.codeResults){
-						tr = $("<tr></tr>");
-						var stock = result.codeResults[index];
-						
-						var $isNull=$("<th></th>").append(id+=1);
-						var $stockCode = $("<td></td>").append(stock.code);
-						var $stockDate = $("<td></td>").append(getFormatedDate(new Date(stock.date)));
-						var $numberOfDays= $("<td></td>").append(stock.numberOfDays);
-						var $min=$("<td></td>").append(stock.min);
-						var $max=$("<td></td>").append(stock.max);
-						var $avg=$("<td></td>").append(stock.avg);
-						var $close= $("<td></td>").append(stock.close);
-						
-						tr.append($isNull);
-						tr.append($stockCode);
-						tr.append($stockDate);
-						tr.append($numberOfDays);
-						tr.append($min);
-						tr.append($max);
-						tr.append($avg);
-						tr.append($close);
+		getCodeResultData();
+		getStockData();
+	}
 
-						$("#code_result_table_content").append(tr);
+	function getCodeResultData() {
+		$("#code_result_table_content").html("");
+		
+		$.ajax({
+					method : "POST",
+					url : "/coderesults",
+					data : {
+						"keyWord" : $("#code_input").val(),
+						"startDate" : getDateFromStr($("#start_date").val()),
+						"endDate" : getDateFromStr($("#end_date").val())
+					},
+					success : function(result) {
+						if (result.message != null) {
+							alert(result.message);
+						}
+
+						var tr;
+
+						if (result.codeResults != null
+								&& result.codeResults.length > 0) {
+
+							var id = 0;
+							for ( var index in result.codeResults) {
+								tr = $("<tr></tr>");
+								var codeResult = result.codeResults[index];
+
+								var $isNull = $("<th></th>").append(id += 1);
+								var $stockCode = $("<td></td>").append(
+										codeResult.code);
+								var $stockDate = $("<td></td>").append(
+										getFormatedDate(new Date(
+												codeResult.date)));
+								var $numberOfDays = $("<td></td>").append(
+										codeResult.numberOfDays);
+								var $min = $("<td></td>")
+										.append(codeResult.min);
+								var $max = $("<td></td>")
+										.append(codeResult.max);
+								var $avg = $("<td></td>")
+										.append(codeResult.avg);
+								var $close = $("<td></td>").append(
+										codeResult.close);
+
+								tr.append($isNull);
+								tr.append($stockCode);
+								tr.append($stockDate);
+								tr.append($numberOfDays);
+								tr.append($min);
+								tr.append($max);
+								tr.append($avg);
+								tr.append($close);
+
+								$("#code_result_table_content").append(tr);
+							}
+
+						}
+					},
+					error : function() {
+						alert("get code result error!!!!");
 					}
-					
+				});
+	}
+
+
+	var startDate,endDate;
+	
+	function getStockData() {
+		startDate = null;
+		endDate = null;
+		$.ajax({
+					method : "POST",
+					url : "/stocks",
+					data : {
+						"keyWord" : $("#code_input").val()
+					},
+					success : function(result) {
+						if (result.message != null) {
+							alert(result.message);
+						}
+
+						var tr;
+
+						if (result.stocks != null && result.stocks.length > 0) {
+
+							stocks = [];
+							
+							inputStartDate = getDateFromStr($("#start_date").val());
+							inputEndDate = getDateFromStr($("#end_date").val());
+							
+							var lastDate;
+							result.stocks.reverse();
+							for ( var index in result.stocks) {
+								var stock = result.stocks[index];
+								var stockJson = [
+										getFormatedDate(new Date(stock.date)),
+										stock.open, stock.close, stock.low,
+										stock.high ];
+								stocks.push(stockJson);
+								
+								
+								/****** set start date and end date*****/
+								itemDate = new Date(stock.date);
+								if(itemDate >= inputStartDate && startDate == null)
+									startDate = itemDate;
+								
+								if(itemDate >= inputEndDate && endDate == null)
+									endDate = itemDate;
+								
+								lastDate = itemDate;
+							}
+							
+
+							if(endDate == null){
+								endDate = lastDate;
+							}
+							
+							stockImage(stocks)
+						}
+					},
+					error : function(XMLHttpRequest, textStatus, errorThrown) {
+						alert("get stocks error!!!!");
+						alert(XMLHttpRequest);
+						alert(textStatus);
+						alert(errorThrown);
+					}
+				});
+	}
+
+	
+	
+	
+	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
+	/************************* stock image ***********************************/
+	
+	
+	var data0 = null;
+	function stockImage(data) {
+		
+		var myChart = echarts.init(document.getElementById('stock_image'));
+		data0 = splitData(data);
+
+		option = {
+			title : {
+				text : '上证指数',
+				left : 0
+			},
+			tooltip : {
+				trigger : 'axis',
+				axisPointer : {
+					type : 'cross'
 				}
 			},
-			error : function() {
-				alert("error!!!!");
+			legend : {
+				data : [ '日K', 'MA5', 'MA10', 'MA20', 'MA30' ]
+			},
+			grid : {
+				left : '10%',
+				right : '10%',
+				bottom : '15%'
+			},
+			xAxis : {
+				type : 'category',
+				data : data0.categoryData,
+				scale : true,
+				boundaryGap : false,
+				axisLine : {
+					onZero : false
+				},
+				splitLine : {
+					show : false
+				},
+				splitNumber : 20,
+				min : 'dataMin',
+				max : 'dataMax'
+			},
+			yAxis : {
+				scale : true,
+				splitArea : {
+					show : true
+				}
+			},
+			dataZoom : [ {
+				type : 'inside',
+				//百分百
+				//start : 20,
+				//end : 100
+				startValue:getFormatedDate(startDate),
+				endValue:getFormatedDate(endDate)
+				//设置起始值
+				//endValue:$("#end_date").val()
+				//endValue:"2018-01-01"
+			}, {
+				show : true,
+				type : 'slider',
+				y : '90%',
+				start : 50,
+				end : 100
+			} ],
+			series : [
+					{
+						name : '日K',
+						type : 'candlestick',
+						data : data0.values,
+						itemStyle : {
+							normal : {
+								color : upColor,
+								color0 : downColor,
+								borderColor : upBorderColor,
+								borderColor0 : downBorderColor
+							}
+						},
+						markPoint : {
+							label : {
+								normal : {
+									formatter : function(param) {
+										return param != null ? Math
+												.round(param.value) : '';
+									}
+								}
+							},
+							data : [ {
+								name : 'XX标点',
+								coord : [ '2013/5/31', 2300 ],
+								value : 2300,
+								itemStyle : {
+									normal : {
+										color : 'rgb(41,60,85)'
+									}
+								}
+							}, {
+								name : 'highest value',
+								type : 'max',
+								valueDim : 'highest'
+							}, {
+								name : 'lowest value',
+								type : 'min',
+								valueDim : 'lowest'
+							}, {
+								name : 'average value on close',
+								type : 'average',
+								valueDim : 'close'
+							} ],
+							tooltip : {
+								formatter : function(param) {
+									return param.name + '<br>'
+											+ (param.data.coord || '');
+								}
+							}
+						},
+						markLine : {
+							symbol : [ 'none', 'none' ],
+							data : [ [ {
+								name : 'from lowest to highest',
+								type : 'min',
+								valueDim : 'lowest',
+								symbol : 'circle',
+								symbolSize : 10,
+								label : {
+									normal : {
+										show : false
+									},
+									emphasis : {
+										show : false
+									}
+								}
+							}, {
+								type : 'max',
+								valueDim : 'highest',
+								symbol : 'circle',
+								symbolSize : 10,
+								label : {
+									normal : {
+										show : false
+									},
+									emphasis : {
+										show : false
+									}
+								}
+							} ], {
+								name : 'min line on close',
+								type : 'min',
+								valueDim : 'close'
+							}, {
+								name : 'max line on close',
+								type : 'max',
+								valueDim : 'close'
+							} ]
+						}
+					}, {
+						name : 'MA5',
+						type : 'line',
+						data : calculateMA(5),
+						smooth : true,
+						lineStyle : {
+							normal : {
+								opacity : 0.5
+							}
+						}
+					}, {
+						name : 'MA10',
+						type : 'line',
+						data : calculateMA(10),
+						smooth : true,
+						lineStyle : {
+							normal : {
+								opacity : 0.5
+							}
+						}
+					}, {
+						name : 'MA20',
+						type : 'line',
+						data : calculateMA(20),
+						smooth : true,
+						lineStyle : {
+							normal : {
+								opacity : 0.5
+							}
+						}
+					}, {
+						name : 'MA30',
+						type : 'line',
+						data : calculateMA(30),
+						smooth : true,
+						lineStyle : {
+							normal : {
+								opacity : 0.5
+							}
+						}
+					},
+
+			]
+		};
+
+		myChart.setOption(option);
+	}
+
+	var upColor = '#ec0000';
+	var upBorderColor = '#8A0000';
+	var downColor = '#00da3c';
+	var downBorderColor = '#008F28';
+
+	function splitData(rawData) {
+		var categoryData = [];
+		var values = []
+		for (var i = 0; i < rawData.length; i++) {
+			categoryData.push(rawData[i].splice(0, 1)[0]);
+			values.push(rawData[i])
+		}
+		return {
+			categoryData : categoryData,
+			values : values
+		};
+	}
+
+	function calculateMA(dayCount) {
+		var result = [];
+		for (var i = 0, len = data0.values.length; i < len; i++) {
+			if (i < dayCount) {
+				result.push('-');
+				continue;
 			}
-		});
+			var sum = 0;
+			for (var j = 0; j < dayCount; j++) {
+				sum += data0.values[i - j][1];
+			}
+			result.push(sum / dayCount);
+		}
+		return result;
 	}
 </script>
 </head>
@@ -145,7 +471,14 @@
 			</div>
 		</div>
 
+		<!-- stock image -->
+		<div class="row">
+			<div class="col-md-12">
+				<div id="stock_image" style="width: 100%; height: 400px;"></div>
+			</div>
+		</div>
 
+		<!-- code result table -->
 		<div class="row">
 			<div class="col-md-12">
 				<div class="panel panel-default">

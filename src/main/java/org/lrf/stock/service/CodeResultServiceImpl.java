@@ -20,6 +20,7 @@ import org.lrf.stock.service.calculator.CodeResultCalculator;
 import org.lrf.stock.util.DateUtil;
 import org.lrf.stock.util.Day;
 import org.lrf.stock.util.Keys;
+import org.lrf.stock.util.NumberUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -144,14 +145,8 @@ public class CodeResultServiceImpl implements CodeResultService {
 
 	}
 
-	public static boolean isNumericzidai(String str) {
-		Pattern pattern = Pattern.compile("-?[0-9]+.?[0-9]+");
-		Matcher isNum = pattern.matcher(str);
-		if (!isNum.matches()) {
-			return false;
-		}
-		return true;
-	}
+	@Autowired
+	private KeywordService keywordService;
 
 	@Override
 	public Map<String, Object> getCodeResultByKeyWordAndPeriod(String keyWord, Date startDate, Date endDate) {
@@ -160,21 +155,11 @@ public class CodeResultServiceImpl implements CodeResultService {
 		
 		String code = null;
 		
-		if(!isNumericzidai(keyWord)) {
-			Code codeEntity = null;
-			if((codeEntity = codeRepository.getCodeByName(keyWord)) == null) {
-				result.put(Keys.MESSAGE, Keys.NO_STOCK);
-				return result;
-			}else {
-				code = codeEntity.getCode();
-			}
-		}else {
-			if(codeRepository.getCodeEntityByCode(keyWord) == null) {
-				result.put(Keys.MESSAGE, Keys.NO_STOCK);
-				return result;
-			}else {
-				code = keyWord;
-			}
+		try {
+			code = keywordService.getCodeFromKeyword(keyWord);
+		} catch (Exception e) {
+			result.put(Keys.MESSAGE, e.toString());
+			return result;
 		}
 		
 		result.put(Keys.CODE_RESULTS,codeResultRepository.getCodeResultByKeyWordAndPeriod(code, startDate, endDate, Day.getDays()));

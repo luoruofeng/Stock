@@ -10,7 +10,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,7 +35,10 @@ import org.lrf.stock.service.countdownlatch_proxy.CountDownLatchUser;
 import org.lrf.stock.service.countdownlatch_proxy.CountDownLockProxy;
 import org.lrf.stock.service.pageprocessor.NewStockPageProcessor;
 import org.lrf.stock.util.CsvUtil;
+import org.lrf.stock.util.Day;
 import org.lrf.stock.util.FileUtil;
+import org.lrf.stock.util.Keys;
+import org.lrf.stock.util.NumberUtil;
 import org.lrf.stock.util.csv.XTableEntityFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -361,5 +366,45 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 		codeRepository.findAll().forEach((code)->{
 			savePeriodStock(code.getCode());
 		});
+	}
+
+
+	@Autowired
+	private KeywordService keywordService;
+	
+	@Override
+	public Map<String, Object> getStocksByKeyWordAndPeriod(String keyWord, Date startDate, Date endDate) {
+		Map<String, Object> result = new HashMap<>();
+		
+		String code = null;
+		
+		try {
+			code = keywordService.getCodeFromKeyword(keyWord);
+		} catch (Exception e) {
+			result.put(Keys.MESSAGE, e.toString());
+			return result;
+		}
+		
+		result.put(Keys.STOCKS,stockRepository.getStockByCodeAndPeriod(code, startDate, endDate));
+		
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> getStocksByKeyword(String keyWord){
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		String code = null;
+		try {
+			code = keywordService.getCodeFromKeyword(keyWord);
+		} catch (Exception e) {
+			result.put(Keys.MESSAGE, e.toString());
+			return result;
+		}
+		
+		result.put(Keys.STOCKS,stockRepository.getStocksEntityByStock(code));
+		
+		return result;
 	}
 }
