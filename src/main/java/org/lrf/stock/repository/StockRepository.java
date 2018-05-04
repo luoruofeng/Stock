@@ -71,7 +71,7 @@ public class StockRepository {
 	public List<Stock> getStocksEntityByStock(String code) {
 		DBObject dbObject = new BasicDBObject();
 		dbObject.put("code", code);
-		DBCursor dbCursor = (DBCursor) mongoTemplate.getCollection("stock").find(dbObject).maxTime(8, TimeUnit.HOURS);
+		DBCursor dbCursor = (DBCursor) mongoTemplate.getCollection("stock").find(dbObject).maxTime(8, TimeUnit.HOURS).sort(new BasicDBObject("date",-1));
 		List<Stock> result = new ArrayList<>();
 		while (dbCursor.hasNext()) {
 			result.add(createStock(dbCursor.next()));

@@ -12,12 +12,16 @@ import org.json.JSONObject;
 import org.lrf.stock.csv_mapper.CsvBasicMapper;
 import org.lrf.stock.util.csv.EntityFactory;
 import org.lrf.stock.util.csv.XTableEntityFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.hutool.core.text.csv.CsvData;
 import cn.hutool.core.text.csv.CsvReader;
 import cn.hutool.core.util.CharsetUtil;
 
 public class CsvUtil {
+	private Logger logger = LoggerFactory.getLogger(CsvUtil.class);
+	
 	private String filename = null;
 	private BufferedReader br= null;
 	private List<String> list = new ArrayList<>();
@@ -128,8 +132,7 @@ public class CsvUtil {
 				array.put(jsonObject);
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			logger.debug("Create CsvUtil  Exception"+e);
 		}
 		return array;		
 	}

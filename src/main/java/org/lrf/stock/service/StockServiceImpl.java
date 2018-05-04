@@ -35,10 +35,8 @@ import org.lrf.stock.service.countdownlatch_proxy.CountDownLatchUser;
 import org.lrf.stock.service.countdownlatch_proxy.CountDownLockProxy;
 import org.lrf.stock.service.pageprocessor.NewStockPageProcessor;
 import org.lrf.stock.util.CsvUtil;
-import org.lrf.stock.util.Day;
 import org.lrf.stock.util.FileUtil;
 import org.lrf.stock.util.Keys;
-import org.lrf.stock.util.NumberUtil;
 import org.lrf.stock.util.csv.XTableEntityFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,14 +52,14 @@ import us.codecraft.webmagic.processor.PageProcessor;
 @Component("stockService")
 public class StockServiceImpl implements PageProcessor, StockService, CountDownLatchUser {
 
-	private Logger logger = LoggerFactory.getLogger(StockServiceImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(StockServiceImpl.class);
 
 	@Autowired
 	private CountDownLockProxy countDownLockProxy;
 
 	@Value("${stock.excel.dir}")
 	private String excelDir;
-	
+
 	@Value("${stock.tempExcel.dir}")
 	private String tempExcelDir;
 
@@ -162,63 +160,59 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 		try {
 			request.setURI(new URI(createExcelUrl(code, startDate)));
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("URI Syntax Exception" + e);
 		}
 		return request;
 	}
-	
+
 	public void downloadRestExcelFilesAndSaveExcel() {
-		System.out.println("_________________download Rest Excel File And Save Excel___________________");
-		downloadExcelFilesAndSaveExcel(this.tempExcelDir,ExcelStartDate.LAST_DATE);
-	}
-	
-	public void downloadAllExcelFilesAndSaveExcel() {
-		System.out.println("_________________download All Excel File And Save Excel___________________");
-		downloadExcelFilesAndSaveExcel(this.excelDir,ExcelStartDate.LAUNCH_DATE);
-	}
-	
-	enum ExcelStartDate{
-		LAST_DATE,LAUNCH_DATE
+		downloadExcelFilesAndSaveExcel(this.tempExcelDir, ExcelStartDate.LAST_DATE);
 	}
 
-	public void downloadExcelFilesAndSaveExcel(String dirPath,ExcelStartDate excelStartDate) {
+	public void downloadAllExcelFilesAndSaveExcel() {
+		logger.info("_________________INIT:  first download All CSV stocks___________________");
+		downloadExcelFilesAndSaveExcel(this.excelDir, ExcelStartDate.LAUNCH_DATE);
+	}
+
+	enum ExcelStartDate {
+		LAST_DATE, LAUNCH_DATE
+	}
+
+	public void downloadExcelFilesAndSaveExcel(String dirPath, ExcelStartDate excelStartDate) {
 		Date startDate = new Date();
 		FileUtil.createDir(dirPath);
 
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpRequestBase request = createHttpUriRequestWithOutUrl();
 
-		
 		codeRepository.findAll().forEach(code -> {
 			if (code == null || code.getStartDate() == null)
 				return;
-			
+
 			Date date = null;
-			if(excelStartDate.equals(ExcelStartDate.LAUNCH_DATE)) {
+			if (excelStartDate.equals(ExcelStartDate.LAUNCH_DATE)) {
 				date = code.getStartDate();
-			}else if(excelStartDate.equals(ExcelStartDate.LAST_DATE)) {
+			} else if (excelStartDate.equals(ExcelStartDate.LAST_DATE)) {
 				Stock stock = stockRepository.getLastStock(code.getCode());
-				if(stock == null)
+				if (stock == null)
 					date = code.getStartDate();
 				else
 					date = stock.getDate();
 			}
-			
-			saveExcel(code.getCode(),
-					downloadFile(client, setUrlToHttpRequestBase(request, code.getCode(), date)),dirPath);
+
+			saveExcel(code.getCode(), downloadFile(client, setUrlToHttpRequestBase(request, code.getCode(), date)),
+					dirPath);
 		});
 		try {
 			Thread.sleep(2 * 1000);
 			request.releaseConnection();
 			client.close();
-			System.out.println((startDate.getTime() - new Date().getTime()) / 1000 / 60);
+			logger.info(
+					"total time of download csv (min):" + ((startDate.getTime() - new Date().getTime()) / 1000 / 60));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Client Close Exception" + e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Sleep Exception" + e);
 		}
 
 	}
@@ -247,61 +241,63 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 			HttpResponse httpResponse = client.execute(httpUriRequest);
 			return httpResponse.getEntity().getContent();
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("HTTP-CLIENT's httl protocal error", e);
+		} catch (UnsupportedOperationException e) {
+			logger.debug("Unsupported Operation Exception" + e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Other Exception" + e);
 		}
 		return null;
 	}
 
-	private void saveExcel(String code, InputStream inputStream,String dirPath) {
+	private void saveExcel(String code, InputStream inputStream, String dirPath) {
 		if (writeExcelFixedThreadPool == null)
 			writeExcelFixedThreadPool = Executors.newFixedThreadPool(this.excelPoolSize);
 		writeExcelFixedThreadPool.execute(new StreamOperationRunnable(code, dirPath, excelSuffix, inputStream));
 	}
 
 	public void dropAllStock() {
-		System.out.println("----------------- drop stock collection -----------------");
+		logger.info("-------------- drop all stock collection in mongo db  -----------------");
 		stockRepository.dropCollection();
 	}
-	
+
 	public void saveAllCSVToDB() {
-		System.out.println("----------------- save All CSV To DB -----------------");
-		transformCSVToEntity(this.excelDir,true);
+		logger.info("----------------- transform CSV to entity and save All entity To mongo db -----------------");
+		transformCSVToEntity(this.excelDir, true);
 	}
-	
+
 	public void saveTempCSVToDB() {
-		transformCSVToEntity(this.tempExcelDir,false);
+		transformCSVToEntity(this.tempExcelDir, false);
 	}
 
 	private final static String CSV_SUFFIX = ".csv";
 	private final static int READ_CSV_NUMBER_THREAD = 99;
 	private File[] csvFiles;
 
-	private synchronized void transformCSVToEntity(String dir,boolean isBlock) {
-		
+	private synchronized void transformCSVToEntity(String dir, boolean isBlock) {
+
 		csvFiles = FileUtil.getChildrenFile(dir, CSV_SUFFIX);
-		
+
 		if (csvFiles == null || csvFiles.length < 1) {
-			System.out.println("have no any csv file!!!");
+			logger.info("directory is empty. There is no any csv file!!!");
 			return;
 		}
 
 		try {
-			countDownLockProxy.procced(csvFiles.length, this,isBlock);
+			countDownLockProxy.procced(csvFiles.length, this, isBlock);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.debug("Interrupted Exception" + e);
 		}
 	}
-	
-	private List<Stock> filterEliminateEmpty(List<Stock> stocks){
-		return stocks.stream().filter(s->{return !(s.getClose() == 0);}).collect(Collectors.toList());
+
+	private List<Stock> filterEliminateEmpty(List<Stock> stocks) {
+		return stocks.stream().filter(s -> {
+			return !(s.getClose() == 0);
+		}).collect(Collectors.toList());
 	}
-	
-	private List<Stock> distinctRepeatDate(List<Date> existStocksDate,List<Stock> stocks) {
-		return stocks.stream().filter(newStock->{
+
+	private List<Stock> distinctRepeatDate(List<Date> existStocksDate, List<Stock> stocks) {
+		return stocks.stream().filter(newStock -> {
 			return !existStocksDate.contains(newStock.getDate());
 		}).collect(Collectors.toList());
 	}
@@ -315,28 +311,30 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 
 		for (int i = 0; i < csvFiles.length; i++) {
 			final int temp = i;
-			System.out.println(this);
 			es.execute(() -> {
-				System.out.println(this);
 				try {
-					List<Stock> stocks = CsvUtil.readCSV(new XTableEntityFactory<>(), csvFiles[temp], 1, 0, new Stock());
-					if(stocks == null || stocks.isEmpty())
+					List<Stock> stocks = CsvUtil.readCSV(new XTableEntityFactory<>(), csvFiles[temp], 1, 0,
+							new Stock());
+					if (stocks == null || stocks.isEmpty())
 						return;
-					
-					List<Date> existStocksDate = stockRepository.getStocksEntityByStock(stocks.get(0).getCode()).stream().map(stock->{return stock.getDate();}).collect(Collectors.toList());
-					
-					if(existStocksDate != null && stocks != null && !existStocksDate.isEmpty() && !stocks.isEmpty() )
+
+					List<Date> existStocksDate = stockRepository.getStocksEntityByStock(stocks.get(0).getCode())
+							.stream().map(stock -> {
+								return stock.getDate();
+							}).collect(Collectors.toList());
+
+					if (existStocksDate != null && stocks != null && !existStocksDate.isEmpty() && !stocks.isEmpty())
 						stocks = distinctRepeatDate(existStocksDate, stocks);
-					
 
 					stocks = filterEliminateEmpty(stocks);
-					
+
 					stockRepository.saveStocks(stocks);
-					stocks.forEach(stock->{
-						System.out.println("save stock to db code:"+ stock.getCode() + "   date:" + stock.getDate());						
+					stocks.forEach(stock -> {
+						logger.info(
+								"Save stocks to mongo db.    code:" + stock.getCode() + "   date:" + stock.getDate());
 					});
 				} catch (Exception e) {
-					System.out.println(e);
+					logger.error("transform stock from csv to entity,and save entity to mongo", e);
 				}
 
 				if (countDownLatch != null)
@@ -347,7 +345,8 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 	}
 
 	public void createStockIndex() {
-		System.out.println("-----------------------create code index in stock collection-----------------------");
+		logger.info(
+				"----------------------- Create code index of stock collection in mongo DB -----------------------");
 		stockRepository.createIndex("code");
 	}
 
@@ -357,54 +356,56 @@ public class StockServiceImpl implements PageProcessor, StockService, CountDownL
 	}
 
 	public void savePeriodStock(String code) {
-		Spider.create(new NewStockPageProcessor(code,stockRepository)).thread(1).addUrl("http://quotes.money.163.com/trade/lsjysj_"+code+".html").run();
+		Spider.create(new NewStockPageProcessor(code, stockRepository)).thread(1)
+				.addUrl("http://quotes.money.163.com/trade/lsjysj_" + code + ".html").run();
 	}
 
 	@Deprecated
 	@Override
 	public void saveNoRecordStock() {
-		codeRepository.findAll().forEach((code)->{
+		codeRepository.findAll().forEach((code) -> {
 			savePeriodStock(code.getCode());
 		});
 	}
 
-
 	@Autowired
 	private KeywordService keywordService;
-	
+
 	@Override
 	public Map<String, Object> getStocksByKeyWordAndPeriod(String keyWord, Date startDate, Date endDate) {
 		Map<String, Object> result = new HashMap<>();
-		
+
 		String code = null;
-		
+
 		try {
 			code = keywordService.getCodeFromKeyword(keyWord);
 		} catch (Exception e) {
+			logger.debug("Get Code Exception"+e);
 			result.put(Keys.MESSAGE, e.toString());
 			return result;
 		}
-		
-		result.put(Keys.STOCKS,stockRepository.getStockByCodeAndPeriod(code, startDate, endDate));
-		
+
+		result.put(Keys.STOCKS, stockRepository.getStockByCodeAndPeriod(code, startDate, endDate));
+
 		return result;
 	}
-	
+
 	@Override
-	public Map<String, Object> getStocksByKeyword(String keyWord){
-		
+	public Map<String, Object> getStocksByKeyword(String keyWord) {
+
 		Map<String, Object> result = new HashMap<>();
-		
+
 		String code = null;
 		try {
 			code = keywordService.getCodeFromKeyword(keyWord);
 		} catch (Exception e) {
+			logger.debug("Get Code Exception"+e);
 			result.put(Keys.MESSAGE, e.toString());
 			return result;
 		}
-		
-		result.put(Keys.STOCKS,stockRepository.getStocksEntityByStock(code));
-		
+
+		result.put(Keys.STOCKS, stockRepository.getStocksEntityByStock(code));
+
 		return result;
 	}
 }

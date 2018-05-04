@@ -68,8 +68,9 @@
 
 	function getCodeResultData() {
 		$("#code_result_table_content").html("");
-		
-		$.ajax({
+
+		$
+				.ajax({
 					method : "POST",
 					url : "/coderesults",
 					data : {
@@ -129,13 +130,13 @@
 				});
 	}
 
+	var startDate, endDate;
 
-	var startDate,endDate;
-	
 	function getStockData() {
 		startDate = null;
 		endDate = null;
-		$.ajax({
+		$
+				.ajax({
 					method : "POST",
 					url : "/stocks",
 					data : {
@@ -151,10 +152,11 @@
 						if (result.stocks != null && result.stocks.length > 0) {
 
 							stocks = [];
-							
-							inputStartDate = getDateFromStr($("#start_date").val());
+
+							inputStartDate = getDateFromStr($("#start_date")
+									.val());
 							inputEndDate = getDateFromStr($("#end_date").val());
-							
+
 							var lastDate;
 							result.stocks.reverse();
 							for ( var index in result.stocks) {
@@ -164,24 +166,28 @@
 										stock.open, stock.close, stock.low,
 										stock.high ];
 								stocks.push(stockJson);
-								
-								
+
 								/****** set start date and end date*****/
 								itemDate = new Date(stock.date);
-								if(itemDate >= inputStartDate && startDate == null)
+								console.log(itemDate);
+								if (itemDate >= inputStartDate && startDate == null) {
 									startDate = itemDate;
-								
-								if(itemDate >= inputEndDate && endDate == null)
-									endDate = itemDate;
-								
-								lastDate = itemDate;
-							}
-							
+								}
 
-							if(endDate == null){
+								if (itemDate >= inputEndDate && endDate == null) {
+									endDate = itemDate;
+								}
+
+								lastDate = itemDate;
+
+							}
+
+							if (endDate == null) {
 								endDate = lastDate;
 							}
-							
+
+						
+
 							stockImage(stocks)
 						}
 					},
@@ -194,16 +200,12 @@
 				});
 	}
 
-	
-	
-	
 	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
 	/************************* stock image ***********************************/
-	
-	
+
 	var data0 = null;
 	function stockImage(data) {
-		
+
 		var myChart = echarts.init(document.getElementById('stock_image'));
 		data0 = splitData(data);
 
@@ -252,11 +254,11 @@
 				//百分百
 				//start : 20,
 				//end : 100
-				startValue:getFormatedDate(startDate),
-				endValue:getFormatedDate(endDate)
-				//设置起始值
-				//endValue:$("#end_date").val()
-				//endValue:"2018-01-01"
+				startValue : getFormatedDate(startDate),
+				endValue : getFormatedDate(endDate)
+			//设置起始值
+			//endValue:$("#end_date").val()
+			//endValue:"2018-01-01"
 			}, {
 				show : true,
 				type : 'slider',

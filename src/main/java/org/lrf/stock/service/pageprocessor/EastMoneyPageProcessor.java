@@ -16,6 +16,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.lrf.stock.entity.Code;
 import org.lrf.stock.repository.CodeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
@@ -26,6 +28,8 @@ import us.codecraft.webmagic.selector.Selectable;
 
 public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 
+	private  Logger logger = LoggerFactory.getLogger(EastMoneyPageProcessor.class);
+	
 	private final static int REQUEST_TIME_OUT = 20000;
 
 	private final static int RETYR_TIMES = 1;
@@ -38,7 +42,6 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 
 	@Override
 	public void process(Page page) {
-		System.out.println("&&&&&&&&&&&&&");
 		codeRepository.dropCollection();
 		Selectable selectable = page.getHtml().xpath("//div[@id='quotesearch']/ul/li/a[@href]/text()");
 		List<String> allCodeData = selectable.all();
@@ -94,7 +97,7 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 	private void checkSuccess() {
 		List<Code> codes = codeRepository.findAll();
 		if (codes == null || codes.size() < 1) {
-			System.out.println("can not get data from east money page!");
+			logger.info("INIT: Can not get data from east money page!");
 			retrySpareUrl();
 		}
 	}
@@ -110,14 +113,13 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 				resultSB.append(new String(chars));
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Read or Append Exception"+e);
 		}
 		return resultSB.toString();
 	}
 
 	private void retrySpareUrl() {
-		System.out.println("-----------开始重试-----------");
+		logger.info("-----------get all code retry from 163-----------");
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet();
 		httpGet.setURI(URI.create(
@@ -126,14 +128,11 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 			try {
 				parseJsonStr(getStringFromInputStream(client.execute(httpGet).getEntity().getContent()), allCode);
 			} catch (UnsupportedOperationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug("Unsupported Operation Exception"+e);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug("Client Protocol Exception"+e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug("Other Exception"+e);
 			}
 		});
 
@@ -163,8 +162,7 @@ public class EastMoneyPageProcessor implements PageProcessor, SpiderListener {
 				}
 			});
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("JSON Exception"+e);
 		}
 	}
 

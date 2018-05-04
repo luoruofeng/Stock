@@ -10,10 +10,14 @@ import java.util.List;
 import org.lrf.stock.util.csv.EntityFactory;
 import org.lrf.stock.util.csv.XTableEntityFactory;
 import org.lrf.stock.util.csv.YTableEntityFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.hutool.core.text.csv.CsvData;
 
 public class CsvBasicMapper<T> {
+
+	private Logger logger = LoggerFactory.getLogger(CsvBasicMapper.class);
 	
 	private CsvData csvData;
 
@@ -39,23 +43,17 @@ public class CsvBasicMapper<T> {
 			//System.out.println("create stock ----- "+result.toString());
 			return result;
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Instantiation(实例化) T Exception "+e);
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Illegal Access（安全权限）  Exception "+e);
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("IllegalArgument（非法参数）  Exception "+e);
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("InvocationTarget（反射 ）  Exception "+e);
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("NoSuchMethod  Exception "+e);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Security（安全）  Exception "+e);
 		}
 		return null;
 	}

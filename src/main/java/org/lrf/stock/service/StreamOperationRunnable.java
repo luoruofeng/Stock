@@ -3,17 +3,18 @@ package org.lrf.stock.service;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 
-import cn.hutool.core.io.file.FileWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamOperationRunnable implements Runnable {
 
+	private static Logger logger = LoggerFactory.getLogger(StreamOperationRunnable.class);
+	
 	public StreamOperationRunnable(String code, String excelDir, String excelSuffix, InputStream inputStream) {
 		this.code = code;
 		this.excelDir = excelDir;
@@ -32,18 +33,14 @@ public class StreamOperationRunnable implements Runnable {
 	public void run() {
 		try {
 			writeInputStreamToDisk();
-		} catch (UnsupportedOperationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.debug("Have  Exception" +e);
 		}
 	}
 
 	static int count = 0;
 
-	private void writeInputStreamToDisk() throws IOException {
+	private void writeInputStreamToDisk()   {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		try {
@@ -58,15 +55,16 @@ public class StreamOperationRunnable implements Runnable {
 				bw.newLine();
 				bw.flush();
 			}
-			System.out.println("download excel :" + code + ".csv");
-		} catch (
-
-		IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("Download csv :"+file.getPath());
+		} catch (IOException e) {
+			logger.debug("Read Or Write Exception"+e);
 		} finally {
-			br.close();
-			bw.close();
+			try {
+				br.close();
+				bw.close();
+			} catch (IOException e) {
+				logger.debug("BufferedReader or bufferedWriter close exception"+e);
+			}
 		}
 	}
 }

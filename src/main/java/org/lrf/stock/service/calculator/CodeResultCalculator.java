@@ -1,15 +1,11 @@
 package org.lrf.stock.service.calculator;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
-
-import javax.management.RuntimeErrorException;
 
 import org.lrf.stock.comparable.StockCloseComparable;
 import org.lrf.stock.entity.Code;
@@ -17,8 +13,13 @@ import org.lrf.stock.entity.CodeResult;
 import org.lrf.stock.entity.Stock;
 import org.lrf.stock.util.DateUtil;
 import org.lrf.stock.util.Day;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CodeResultCalculator {
+	
+	private static Logger logger = LoggerFactory.getLogger(CodeResultCalculator.class); 
+	
 	private List<Stock> stocks;
 	private Stock currentStock;
 	private Day day;
@@ -59,10 +60,8 @@ public class CodeResultCalculator {
 		//code result 赋值
 		setCodeResult();
 		
-		printAllStockesByCodeAndStartDate();
-		System.out.println(codeResult);
-		System.out.println("-----------------------------");
-		System.out.println("\n");
+		//printAllStockesByCodeAndStartDate();
+		logger.info("Calculate codeResult. "+codeResult);
 	}
 	
 	private void setCurrentStock() {
@@ -193,7 +192,7 @@ public class CodeResultCalculator {
 		stocks.forEach(s -> {
 			sb.append(DateUtil.getStr(s.getDate())).append(" ").append(s.getClose()).append(" ");
 		});
-		System.out.println(sb.toString());
+		logger.debug(sb.toString());
 	}
 
 	private void setAvg() {

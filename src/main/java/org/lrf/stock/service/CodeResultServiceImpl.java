@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.lrf.stock.comparable.StockDateComparable;
 import org.lrf.stock.entity.Code;
@@ -20,13 +18,16 @@ import org.lrf.stock.service.calculator.CodeResultCalculator;
 import org.lrf.stock.util.DateUtil;
 import org.lrf.stock.util.Day;
 import org.lrf.stock.util.Keys;
-import org.lrf.stock.util.NumberUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CodeResultServiceImpl implements CodeResultService {
 
+	private static Logger logger = LoggerFactory.getLogger(CodeResultServiceImpl.class);
+	
 	@Autowired
 	private CodeRepository codeRepository;
 
@@ -44,8 +45,8 @@ public class CodeResultServiceImpl implements CodeResultService {
 
 	public void saveAllCodeResult() {
 
-		System.out.println("------------caculate code result and save --------------------");
-
+		logger.info("------------ Caculate codeResult and Save to Mongo DB --------------------");
+		Date startDate = new Date();
 		List<Code> codes = codeRepository.findAll();
 		for (Code code : codes) {
 			Stock startDateStock = stockRepository.getFirstStock(code.getCode());
@@ -54,14 +55,15 @@ public class CodeResultServiceImpl implements CodeResultService {
 			for (Date currentDate = startDateStock.getDate(); !currentDate
 					.after(lastDateStock.getDate()); currentDate = DateUtil.addOneDay(currentDate)) {
 				NUMBER_OF_CODE_RESULT += 1;
-				System.out.println("\n\n\n calculate code result completed code:" + code.getCode() + " date:"
-						+ DateUtil.getStr(currentDate));
+				
 				this.saveCodeResult(currentDate, code);
+				
+				logger.info("Calculate codeResult and save to mongo DB. "+" code:"+code+" date:"+currentDate+" Start Date of calculate codeResult :"+startDateStock +" End Date of calculate codeResult :"+lastDateStock );
 
 			}
 		}
 
-		System.out.println(NUMBER_OF_CODE_RESULT + " finish!!!!!");
+		logger.info("Calculate codeResult. Total of"+NUMBER_OF_CODE_RESULT + " codeResult calculated !!!!! spend " +((new Date().getTime()-startDate.getTime())/1000/60)+" min");
 	}
 
 	private List<Stock> setStockListByCalculateDate(List<Stock> stocks, Date calculateDate) {
@@ -72,18 +74,18 @@ public class CodeResultServiceImpl implements CodeResultService {
 					stocks.get(0).getDate());
 
 			Order order = null;
-			System.out.println(halfOfBetweenDays + "    " + calculateDate.after(halfOfBetweenDays));
 			if (calculateDate.after(halfOfBetweenDays)) {
 				order = Order.DESC;
 			} else {
 				Collections.reverse(stocks);
 				order = Order.ASC;
 			}
-			return subListByOrder(stocks, order, calculateDate);
 
+			return subListByOrder(stocks, order, calculateDate);
 		} catch (Exception e) {
-			throw e;
+			 logger.debug("Get HalfOfBetweenDays Exception:"+e);
 		}
+		return null;
 	}
 
 	enum Order {
@@ -158,6 +160,7 @@ public class CodeResultServiceImpl implements CodeResultService {
 		try {
 			code = keywordService.getCodeFromKeyword(keyWord);
 		} catch (Exception e) {
+			logger.debug("Get Code Exception "+e);
 			result.put(Keys.MESSAGE, e.toString());
 			return result;
 		}

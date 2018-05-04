@@ -27,11 +27,17 @@ public class MongoConfig {
 	@Value("${spring.data.mongodb.database}")
 	private String dbName;
 	
+	@Value("${spring.data.mongodb.host}")
+	private String host;
+	
+	@Value("${spring.data.mongodb.port}")
+	private String port;
+	
 	@Bean
 	public MongoTemplate mongoTemplate() {
 		System.out.println("*** change mongodb properties ***");
 		MongoClientOptions mongoClientOptions = MongoClientOptions.builder(mongoClient.getMongoClientOptions()).maxWaitTime(maxWaitTime).maxConnectionLifeTime(maxConnectionLifeTime).connectTimeout(connectTimeout).build();
-		MongoClient mongoClient = new MongoClient("127.0.0.1:27017", mongoClientOptions);
+		MongoClient mongoClient = new MongoClient(host+":"+port, mongoClientOptions);
 		return new MongoTemplate(mongoClient, dbName);
 	}
 }
